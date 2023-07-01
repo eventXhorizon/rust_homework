@@ -5,4 +5,5 @@ fn main() {
     print_a_z_1();
     println!("------------");
     print_a_z_2();
+    println!("------------");
 }
