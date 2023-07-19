@@ -21,10 +21,10 @@ struct StudentOrg {
     name: String,
 }
 
-// 学生和社团是多对多关系
+// 学生可以加入多个社团
 type StudentToOrg = HashMap<u32, Vec<u32>>;
 
-// 学生和课程是多对多关系
+// 学生可以选多门课程
 type StudentToCourses = HashMap<u32, Vec<u32>>;
 
 // 学生管理系统
