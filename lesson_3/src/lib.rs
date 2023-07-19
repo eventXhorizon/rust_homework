@@ -27,7 +27,7 @@ type StudentToOrg = HashMap<u32, Vec<u32>>;
 // 学生和课程是多对多关系
 type StudentToCourses = HashMap<u32, Vec<u32>>;
 
-// 学生管理
+// 学生管理系统
 #[derive(Debug, Clone)]
 struct StudentManager {
     students: Vec<Student>,
@@ -37,7 +37,7 @@ struct StudentManager {
     student_to_courses: StudentToCourses,
 }
 
-impl StudentManager {
+impl StudentManager{
     fn new() -> Self {
         Self {
             students: vec![],
@@ -79,7 +79,7 @@ impl StudentManager {
         self.student_to_orgs.entry(student_id).or_default().push(org_id);
         let org = StudentOrg {
             id: org_id,
-            name: self.get_org(1).unwrap().name.clone()
+            name: self.get_org(org_id).unwrap_or(&StudentOrg{ id: 0, name: "Unknown".to_string() }).name.clone()
         };
         self.orgs.push(org);
     }
@@ -89,6 +89,22 @@ impl StudentManager {
         self.student_to_courses.entry(student_id).or_default().push(course_id);
     }
 
+    // 设置课程信息
+    fn set_course(&mut self, course: Course) {
+        let c = Course {
+            id: course.id,
+            name: course.name,
+            teacher: course.teacher,
+        };
+        self.courses.push(c);
+    }
+
+    // 获取课程信息
+    fn get_course(&self, id: u32) -> Option<&Course> {
+        self.courses.iter().find(|c| c.id == id)
+    }
+
+    // 设置社团
     fn set_org(&mut self, org: StudentOrg) {
         let org = StudentOrg {
             id: org.id,
@@ -103,18 +119,33 @@ impl StudentManager {
     }
 
     // 查询学生的社团
-    // fn get_student_orgs(&self, student_id: u32) -> Vec<&StudentOrg> {
     fn get_student_orgs(&self, student_id: u32) -> Vec<&StudentOrg> {
         let org_ids = self.student_to_orgs.get(&student_id);
         let mut orgs = Vec::new();
 
-        for id in org_ids.unwrap() {
+        let o_default: Vec<u32> = Vec::new();
+        for id in org_ids.unwrap_or(&o_default) {
             if let Some(org) = self.get_org(*id) {
                 orgs.push(org);
             }
         }
 
         orgs
+    }
+
+    // 查询学生的课程
+    fn get_student_courses(&self, student_id: u32) -> Vec<&Course> {
+        let course_ids = self.student_to_courses.get(&student_id);
+        let mut courses = Vec::new();
+
+        let c_default: Vec<u32> = Vec::new();
+        for id in course_ids.unwrap_or(&c_default) {
+            if let Some(c) = self.get_course(*id) {
+                courses.push(c);
+            }
+        }
+
+        courses
     }
 }
 
@@ -159,5 +190,24 @@ mod tests {
         let orgs = system.get_student_orgs(1);
         assert_eq!(orgs.len(), 2);
         println!("{:?}", system);
+        // 加入一个不存在的社团
+        system.enroll_org(1, 3);
+        let not_exist_org = system.get_org(3);
+        assert_eq!(not_exist_org.unwrap().name, "Unknown");
+
+        // 创建课程
+        let c1 = Course {
+            id: 1,
+            name: "数据结构".to_string(),
+            teacher: "Mike".to_string()
+        };
+        system.set_course(c1.clone());
+
+        // 张三加入了一门课程
+        system.enroll_course(1, c1.id);
+        let course = system.get_student_courses(1);
+        assert_eq!(course.len(), 1);
+        let course2 = system.get_student_courses(20);
+        assert_eq!(course2.len(), 0);
     }
 }
