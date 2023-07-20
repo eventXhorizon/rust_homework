@@ -156,6 +156,8 @@ mod tests {
     #[test]
     fn system_test() {
         let mut system = StudentManager::new();
+
+        // 新增学生并查询学生信息
         let id = system.create_student("张三".to_string(), 2);
         let stu = system.get_student(id).unwrap();
         assert_eq!(stu.name, "张三");
@@ -209,5 +211,9 @@ mod tests {
         assert_eq!(course.len(), 1);
         let course2 = system.get_student_courses(20);
         assert_eq!(course2.len(), 0);
+
+        // 删除学生
+        system.delete_student(1);
+        assert_eq!(system.students.len(), 0);
     }
 }
