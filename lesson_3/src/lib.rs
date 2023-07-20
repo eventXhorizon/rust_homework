@@ -120,32 +120,20 @@ impl StudentManager{
 
     // 查询学生的社团
     fn get_student_orgs(&self, student_id: u32) -> Vec<&StudentOrg> {
-        let org_ids = self.student_to_orgs.get(&student_id);
-        let mut orgs = Vec::new();
-
-        let o_default: Vec<u32> = Vec::new();
-        for id in org_ids.unwrap_or(&o_default) {
-            if let Some(org) = self.get_org(*id) {
-                orgs.push(org);
-            }
-        }
-
-        orgs
+        self.student_to_orgs.get(&student_id)
+            .iter()
+            .flat_map(|org_ids| org_ids.iter())
+            .filter_map(|id| self.get_org(*id))
+            .collect()
     }
 
     // 查询学生的课程
     fn get_student_courses(&self, student_id: u32) -> Vec<&Course> {
-        let course_ids = self.student_to_courses.get(&student_id);
-        let mut courses = Vec::new();
-
-        let c_default: Vec<u32> = Vec::new();
-        for id in course_ids.unwrap_or(&c_default) {
-            if let Some(c) = self.get_course(*id) {
-                courses.push(c);
-            }
-        }
-
-        courses
+        self.student_to_courses.get(&student_id)
+            .iter()
+            .flat_map(|course_id| course_id.iter())
+            .filter_map(|id| self.get_course(*id))
+            .collect()
     }
 }
 
