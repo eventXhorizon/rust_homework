@@ -131,7 +131,7 @@ impl StudentManager{
     fn get_student_courses(&self, student_id: u32) -> Vec<&Course> {
         self.student_to_courses.get(&student_id)
             .iter()
-            .flat_map(|course_id| course_id.iter())
+            .flat_map(|course_ids| course_ids.iter())
             .filter_map(|id| self.get_course(*id))
             .collect()
     }
