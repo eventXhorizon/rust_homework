@@ -1,5 +1,6 @@
 mod trait_case;
 mod enum_case;
+mod task2;
 
 use crate::enum_case::*;
 use crate::trait_case::*;
